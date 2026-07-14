@@ -1,7 +1,7 @@
 import React from 'react';
-import { Search, Bell, ChevronDown } from 'lucide-react';
+import { Search, Bell, ChevronDown, Menu } from 'lucide-react';
 
-export function Header({ title, subtitle, searchValue, onSearchChange }) {
+export function Header({ title, subtitle, searchValue, onSearchChange, onMenuToggle }) {
   const currentDate = new Date().toLocaleDateString('en-US', {
     month: 'long',
     day: 'numeric',
@@ -9,18 +9,26 @@ export function Header({ title, subtitle, searchValue, onSearchChange }) {
   });
 
   return (
-    <header className="sticky top-0 z-10 flex h-20 items-center justify-between border-b border-[#e2e8f0] bg-white px-8">
+    <header className="sticky top-0 z-20 flex h-20 items-center justify-between border-b border-[#e2e8f0] bg-white px-4 md:px-8">
       {/* Dynamic Title and Date */}
-      <div className="flex flex-col">
-        <h1 className="text-xl font-bold text-[#1e293b] tracking-tight">{title}</h1>
-        <p className="text-xs font-medium text-[#64748b] mt-0.5">{subtitle || currentDate}</p>
+      <div className="flex items-center gap-3">
+        <button 
+          onClick={onMenuToggle}
+          className="md:hidden flex h-10 w-10 items-center justify-center rounded-lg border border-[#e2e8f0] text-[#64748b] hover:bg-[#f8fafc] hover:text-[#1e293b]"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
+        <div className="flex flex-col">
+          <h1 className="text-lg md:text-xl font-bold text-[#1e293b] tracking-tight truncate max-w-[200px] md:max-w-none">{title}</h1>
+          <p className="text-[10px] md:text-xs font-medium text-[#64748b] mt-0.5 truncate max-w-[200px] md:max-w-none">{subtitle || currentDate}</p>
+        </div>
       </div>
 
       {/* Right Section Tools */}
       <div className="flex items-center gap-6">
         
         {/* Search Bar */}
-        <div className="relative w-80">
+        <div className="relative hidden md:block w-64 lg:w-80">
           <Search className="absolute top-3 left-4 h-4.5 w-4.5 text-[#94a3b8]" />
           <input
             type="text"
@@ -45,7 +53,7 @@ export function Header({ title, subtitle, searchValue, onSearchChange }) {
             className="h-10 w-10 rounded-full object-cover ring-2 ring-teal-500/20"
           />
           <div className="hidden flex-col md:flex">
-            <span className="text-xs font-bold text-[#1e293b]">Academy Administrator</span>
+            <span className="text-xs font-bold text-[#1e293b]">Administrator</span>
             <span className="text-[10px] font-bold text-teal-600 uppercase tracking-wider mt-0.5">Admin</span>
           </div>
           <ChevronDown className="h-4 w-4 text-[#64748b] hidden md:block" />

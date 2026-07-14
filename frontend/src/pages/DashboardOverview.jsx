@@ -48,7 +48,7 @@ export function DashboardOverview({ staff = [] }) {
         </div>
 
         <div className="relative z-10 max-w-2xl space-y-2">
-          <h2 className="text-2xl font-bold tracking-tight">Welcome to SBM Academy Portal</h2>
+          <h2 className="text-2xl font-bold tracking-tight">Welcome to SBM Portal</h2>
           <p className="text-xs text-gray-400 leading-relaxed">
             Monitor and manage staff records, daily session attendances, department performances, and academic schedules in real time.
           </p>

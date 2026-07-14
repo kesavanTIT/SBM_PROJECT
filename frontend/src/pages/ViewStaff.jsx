@@ -1,185 +1,197 @@
 import React, { useState } from 'react';
-import { Search, Trash2, Filter, ShieldCheck, Mail, Phone, Calendar } from 'lucide-react';
+import { Search, Filter, Eye, Edit2, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-export function ViewStaff({ staff = [], onDeleteStaff, onCreateStaffClick, searchQuery = '' }) {
-  const [roleFilter, setRoleFilter] = useState('All');
-  const [deptFilter, setDeptFilter] = useState('All');
+export function ViewStaff({ staff = [], onDeleteStaff, onEditStaff, onViewStaff, onCreateStaffClick, searchQuery = '', onSearchChange }) {
+  const [statusFilter, setStatusFilter] = useState('All');
 
-  // Filter staff array based on search query, role filter, and department filter
+  // Filter staff array based on search query and status filter
   const filteredStaff = staff.filter(member => {
     const matchesSearch = 
-      member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      member.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      member.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      member.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      member.staffId?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (member.phone && member.phone.includes(searchQuery));
       
-    const matchesRole = roleFilter === 'All' || member.role === roleFilter;
-    const matchesDept = deptFilter === 'All' || member.department === deptFilter;
+    const matchesStatus = statusFilter === 'All' || member.status === statusFilter;
 
-    return matchesSearch && matchesRole && matchesDept;
+    return matchesSearch && matchesStatus;
   });
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-xl font-extrabold text-[#1e293b] tracking-tight">Staff Profiles</h2>
-          <p className="text-xs text-[#64748b]">View, search, and manage registered SBM Academy staff members.</p>
+    <div className="space-y-6 max-w-[1200px] mx-auto">
+      {/* Header matching screenshot layout */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
+        <div className="flex items-center gap-4">
+          <Button variant="outline" className="text-[#0f172a] font-bold shadow-sm border-[#e2e8f0] px-6">
+            Staff Directory
+          </Button>
         </div>
         <Button 
           onClick={onCreateStaffClick} 
-          className="bg-teal-600 hover:bg-teal-700 text-white shadow-md shadow-teal-700/20"
+          className="bg-[#0f172a] hover:bg-[#1e293b] text-white shadow-md px-6 font-bold rounded-lg"
         >
-          Add Staff Member
+          + New Registration
         </Button>
       </div>
 
-      {/* Filter and Settings Bar */}
-      <div className="flex flex-wrap items-center gap-4 rounded-2xl border border-[#e2e8f0] bg-white p-4 shadow-sm">
+      {/* Filter and Search Bar matching screenshot */}
+      <div className="flex flex-wrap items-center gap-4 rounded-xl border border-[#f1f5f9] bg-white p-3 shadow-sm">
+        <div className="relative flex-1 min-w-[250px]">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Search className="h-4 w-4 text-gray-400" />
+          </div>
+          <input
+            type="text"
+            placeholder="Search staff by ID, name..."
+            className="w-full bg-[#f8fafc] border border-transparent text-[#334155] text-sm rounded-lg py-2.5 pl-10 pr-4 focus:outline-none focus:bg-white focus:border-[#cbd5e1] transition-all"
+            value={searchQuery}
+            onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
+          />
+        </div>
         
-        {/* Role Filter */}
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-bold text-[#64748b]">Role:</span>
-          <select
-            value={roleFilter}
-            onChange={(e) => setRoleFilter(e.target.value)}
-            className="rounded-lg border border-[#cbd5e1] bg-white px-3 py-1.5 text-xs text-[#334155] focus:border-teal-500 focus:outline-none"
-          >
-            <option value="All">All Roles</option>
-            <option value="Teacher">Teacher</option>
-            <option value="Administrator">Administrator</option>
-            <option value="Assistant">Assistant</option>
-            <option value="Coordinator">Coordinator</option>
-          </select>
+        <div className="flex items-center gap-2 border-l border-[#e2e8f0] pl-4">
+          <Filter className="h-4 w-4 text-gray-400" />
+          <span className="text-sm font-bold text-[#64748b]">Status:</span>
+          <div className="flex items-center gap-2 ml-2">
+            <button 
+              onClick={() => setStatusFilter('All')}
+              className={`px-3 py-1 rounded-md text-xs font-bold transition-colors ${statusFilter === 'All' ? 'bg-[#0f172a] text-white' : 'bg-white border border-[#e2e8f0] text-[#64748b] hover:bg-gray-50'}`}
+            >
+              All
+            </button>
+            <button 
+              onClick={() => setStatusFilter('Present')}
+              className={`px-3 py-1 rounded-md text-xs font-bold transition-colors ${statusFilter === 'Present' ? 'bg-[#0f172a] text-white' : 'bg-white border border-[#e2e8f0] text-[#64748b] hover:bg-gray-50'}`}
+            >
+              Present
+            </button>
+            <button 
+              onClick={() => setStatusFilter('Absent')}
+              className={`px-3 py-1 rounded-md text-xs font-bold transition-colors ${statusFilter === 'Absent' ? 'bg-[#0f172a] text-white' : 'bg-white border border-[#e2e8f0] text-[#64748b] hover:bg-gray-50'}`}
+            >
+              Absent
+            </button>
+          </div>
         </div>
-
-        {/* Department Filter */}
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-bold text-[#64748b]">Dept:</span>
-          <select
-            value={deptFilter}
-            onChange={(e) => setDeptFilter(e.target.value)}
-            className="rounded-lg border border-[#cbd5e1] bg-white px-3 py-1.5 text-xs text-[#334155] focus:border-teal-500 focus:outline-none"
-          >
-            <option value="All">All Departments</option>
-            <option value="Science">Science</option>
-            <option value="Mathematics">Mathematics</option>
-            <option value="English">English</option>
-            <option value="Information Technology">Information Technology</option>
-            <option value="Administration">Administration</option>
-          </select>
-        </div>
-
-        {/* Reset Filters button */}
-        {(roleFilter !== 'All' || deptFilter !== 'All') && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              setRoleFilter('All');
-              setDeptFilter('All');
-            }}
-            className="text-xs text-teal-600 hover:text-teal-700 hover:bg-teal-50"
-          >
-            Reset Filters
-          </Button>
-        )}
-
       </div>
 
-      {/* Staff Table Grid */}
-      <div className="rounded-2xl border border-[#e2e8f0] bg-white shadow-sm overflow-hidden">
+      {/* Staff Table */}
+      <div className="rounded-2xl bg-white shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07)] overflow-hidden border border-[#f1f5f9]">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs text-[#334155]">
-            <thead className="bg-[#f8fafc] text-[10px] font-bold uppercase tracking-wider text-[#64748b] border-b border-[#e2e8f0]">
+          <table className="w-full text-left text-sm text-[#334155]">
+            <thead className="text-[11px] font-black uppercase tracking-wider text-[#94a3b8] border-b border-[#f1f5f9]">
               <tr>
-                <th className="p-4 pl-6">Staff Member</th>
-                <th className="p-4">Contact Info</th>
-                <th className="p-4">Designation</th>
-                <th className="p-4">Department</th>
-                <th className="p-4">Joining Date</th>
-                <th className="p-4 text-center">Status</th>
-                <th className="p-4 pr-6 text-right">Actions</th>
+                <th className="p-5 pl-6 font-extrabold">STAFF DETAILS</th>
+                <th className="p-5 font-extrabold">CONTACT INFO</th>
+                <th className="p-5 font-extrabold">LOCATION</th>
+                <th className="p-5 font-extrabold">DATE OF JOIN</th>
+                <th className="p-5 font-extrabold">STATUS</th>
+                <th className="p-5 pr-6 font-extrabold text-right">ACTIONS</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#f1f5f9]">
               {filteredStaff.map((member) => (
                 <tr key={member.id} className="transition-colors hover:bg-[#f8fafc]/50">
-                  {/* Name Card */}
-                  <td className="p-4 pl-6">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-teal-500/10 text-teal-600 font-extrabold text-xs">
-                        {member.name.split(' ').map(n => n[0]).join('').toUpperCase()}
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="font-bold text-[#1e293b]">{member.name}</span>
-                        <span className="text-[10px] text-[#94a3b8]">ID: #{member.id.toString().slice(-5)}</span>
+                  
+                  {/* Staff Details (Avatar + Name + ID) */}
+                  <td className="p-5 pl-6">
+                    <div className="flex items-center gap-4">
+                      {member.photoUrl ? (
+                        <img 
+                          src={member.photoUrl} 
+                          alt={member.name} 
+                          className="h-11 w-11 rounded-full object-cover border border-[#e2e8f0] shadow-sm"
+                        />
+                      ) : (
+                        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#f1f5f9] text-[#64748b] font-bold text-sm border border-[#e2e8f0]">
+                          {member.name ? member.name.charAt(0).toUpperCase() : '?'}
+                        </div>
+                      )}
+                      
+                      <div className="flex flex-col items-start gap-1">
+                        <span className="font-extrabold text-[#0f172a] text-[13px]">{member.name}</span>
+                        <span className="inline-block bg-[#dbeafe] text-[#1d4ed8] text-[10px] font-bold px-2 py-0.5 rounded-sm">
+                          {member.staffId || member.id}
+                        </span>
                       </div>
                     </div>
                   </td>
 
                   {/* Contact Info */}
-                  <td className="p-4">
-                    <div className="flex flex-col gap-0.5">
-                      <span className="flex items-center gap-1 text-[#64748b]">
-                        <Mail className="h-3.5 w-3.5 text-[#94a3b8]" /> {member.email}
+                  <td className="p-5">
+                    <div className="flex flex-col gap-1">
+                      <span className="text-[11px] font-bold text-[#6366f1] bg-[#eef2ff] px-2 py-0.5 rounded-md inline-block w-fit">
+                        {member.phone}
                       </span>
-                      {member.phone && (
-                        <span className="flex items-center gap-1 text-[#64748b]">
-                          <Phone className="h-3.5 w-3.5 text-[#94a3b8]" /> {member.phone}
-                        </span>
-                      )}
+                      <span className="text-[11px] font-medium text-[#64748b]">
+                        {member.email}
+                      </span>
                     </div>
                   </td>
 
-                  {/* Role */}
-                  <td className="p-4 font-semibold text-[#1e293b]">
-                    <span className="inline-flex items-center gap-1">
-                      <ShieldCheck className="h-4 w-4 text-teal-600" /> {member.role}
-                    </span>
+                  {/* Location */}
+                  <td className="p-5">
+                    <div className="flex flex-col">
+                      <span className="text-[13px] font-bold text-[#334155]">{member.city}</span>
+                      <span className="text-[11px] text-[#ef4444] font-bold mt-0.5">{member.state}</span>
+                    </div>
                   </td>
 
-                  {/* Department */}
-                  <td className="p-4 text-[#64748b]">{member.department}</td>
-
                   {/* Join Date */}
-                  <td className="p-4 text-[#64748b]">
-                    <span className="inline-flex items-center gap-1">
-                      <Calendar className="h-3.5 w-3.5 text-[#94a3b8]" /> {member.joinDate}
+                  <td className="p-5">
+                    <span className="text-[13px] font-extrabold text-[#334155]">
+                      {member.joinDate}
                     </span>
                   </td>
 
                   {/* Status */}
-                  <td className="p-4 text-center">
-                    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold ${
-                      member.status === 'Present'
-                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                        : 'bg-rose-50 text-rose-700 border border-rose-200'
+                  <td className="p-5">
+                    <span className={`inline-flex items-center text-[11px] font-bold ${
+                      member.status === 'Present' || member.status === 'Active'
+                        ? 'text-[#059669]'
+                        : 'text-[#ef4444]'
                     }`}>
-                      {member.status === 'Present' ? 'Active' : 'Absent'}
+                      {member.status === 'Present' ? 'Active' : member.status}
                     </span>
                   </td>
 
                   {/* Action Buttons */}
-                  <td className="p-4 pr-6 text-right">
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      onClick={() => onDeleteStaff(member.id)}
-                      className="h-8 w-8 text-[#94a3b8] hover:text-rose-600 hover:bg-rose-50"
-                      title="Delete Staff member"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                  <td className="p-5 pr-6">
+                    <div className="flex items-center justify-end gap-3">
+                      <button 
+                        className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#3b82f6] text-white hover:bg-[#2563eb] transition-colors shadow-sm"
+                        title="View Staff Details"
+                        onClick={() => onViewStaff && onViewStaff(member.id)}
+                      >
+                        <Eye className="h-4 w-4" />
+                      </button>
+                      <button 
+                        className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#1d4ed8] text-white hover:bg-[#1e40af] transition-colors shadow-sm"
+                        title="Edit Staff"
+                        onClick={() => onEditStaff && onEditStaff(member)}
+                      >
+                        <Edit2 className="h-4 w-4" />
+                      </button>
+                      <button 
+                        className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#ef4444] text-white hover:bg-[#dc2626] transition-colors shadow-sm"
+                        title="Delete Staff"
+                        onClick={() => onDeleteStaff(member.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
 
               {filteredStaff.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-sm font-semibold text-[#64748b]">
-                    No staff members match the filters.
+                  <td colSpan={6} className="py-16 text-center">
+                    <div className="flex flex-col items-center justify-center text-[#64748b]">
+                      <span className="font-bold mb-1">No staff records found</span>
+                      <span className="text-xs">Try adjusting your search or filters.</span>
+                    </div>
                   </td>
                 </tr>
               )}
@@ -190,3 +202,4 @@ export function ViewStaff({ staff = [], onDeleteStaff, onCreateStaffClick, searc
     </div>
   );
 }
+
