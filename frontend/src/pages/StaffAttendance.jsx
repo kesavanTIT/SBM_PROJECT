@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import API_BASE_URL from '../config';
 import { ClipboardCheck, Download, Printer, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import domToImage from 'dom-to-image-more';
@@ -31,7 +32,7 @@ export function StaffAttendance({ staff = [] }) {
         query = `?month=${filterMonth}`;
       }
 
-      const res = await fetch(`http://localhost:5000/api/v1/attendance/all${query}`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/attendance/all${query}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();

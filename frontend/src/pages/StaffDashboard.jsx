@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import API_BASE_URL from '../config';
 import { Clock, MapPin, CheckCircle2, XCircle, LogOut, User, BookOpen, GraduationCap, Map } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -213,7 +214,7 @@ function AttendanceTracker({ staffId }) {
     try {
       const token = localStorage.getItem('sbm_token');
       if (!token) return;
-      const res = await fetch('http://localhost:5000/api/v1/attendance/status', {
+      const res = await fetch(`${API_BASE_URL}/api/v1/attendance/status`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
@@ -257,7 +258,7 @@ function AttendanceTracker({ staffId }) {
       const { latitude, longitude } = pos.coords;
 
       const token = localStorage.getItem('sbm_token');
-      const res = await fetch('http://localhost:5000/api/v1/attendance/check-in', {
+      const res = await fetch(`${API_BASE_URL}/api/v1/attendance/check-in`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -284,7 +285,7 @@ function AttendanceTracker({ staffId }) {
     setError('');
     try {
       const token = localStorage.getItem('sbm_token');
-      const res = await fetch('http://localhost:5000/api/v1/attendance/check-out', {
+      const res = await fetch(`${API_BASE_URL}/api/v1/attendance/check-out`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`

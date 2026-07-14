@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import API_BASE_URL from '../config';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Check, Camera, Upload, Trash2, X, Image as ImageIcon } from 'lucide-react';
 
@@ -61,8 +62,8 @@ export function CreateStaff({ staffList = [], initialData, onAddStaff, onUpdateS
       const token = localStorage.getItem('sbm_token');
       
       const url = isEditing 
-        ? `http://localhost:5000/api/v1/staff/${initialData.id}` 
-        : 'http://localhost:5000/api/v1/staff';
+        ? `${API_BASE_URL}/api/v1/staff/${initialData.id}` 
+        : `${API_BASE_URL}/api/v1/staff`;
         
       const method = isEditing ? 'PUT' : 'POST';
 

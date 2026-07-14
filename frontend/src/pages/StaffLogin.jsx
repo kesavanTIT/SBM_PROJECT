@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import API_BASE_URL from '../config';
 import { Mail, Key, Eye, EyeOff, Loader2, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -15,7 +16,7 @@ export function StaffLogin({ onLogin, onSwitchToAdmin }) {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:5000/api/v1/auth/staff-login', {
+      const response = await fetch(`${API_BASE_URL}/api/v1/auth/staff-login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

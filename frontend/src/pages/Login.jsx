@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff, Mail, Lock, Fingerprint, ArrowRight, Terminal, Server, Cpu } from 'lucide-react';
-import { Logo } from '../components/Logo'; 
+import { Logo } from '../components/Logo';
+import API_BASE_URL from '../config';
 
 export function Login({ onLoginSuccess }) {
   const [email, setEmail] = useState('');
@@ -16,7 +17,7 @@ export function Login({ onLoginSuccess }) {
 
     try {
       // 1. Try Admin Login first
-      const adminResponse = await fetch('http://localhost:5000/api/v1/auth/login', {
+      const adminResponse = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -34,7 +35,7 @@ export function Login({ onLoginSuccess }) {
       }
 
       // 2. If Admin Login fails, try Staff Login with password as staffId
-      const staffResponse = await fetch('http://localhost:5000/api/v1/auth/staff-login', {
+      const staffResponse = await fetch(`${API_BASE_URL}/api/v1/auth/staff-login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

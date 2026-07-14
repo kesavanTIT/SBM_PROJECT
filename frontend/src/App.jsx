@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import API_BASE_URL from './config';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
 import { DashboardOverview } from './pages/DashboardOverview';
@@ -35,7 +36,7 @@ function App() {
   const fetchStaff = async () => {
     try {
       const token = localStorage.getItem('sbm_token');
-      const res = await fetch('http://localhost:5000/api/v1/staff', {
+      const res = await fetch(`${API_BASE_URL}/api/v1/staff`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
@@ -76,7 +77,7 @@ function App() {
     if (window.confirm('Are you sure you want to remove this staff member?')) {
       try {
         const token = localStorage.getItem('sbm_token');
-        const res = await fetch(`http://localhost:5000/api/v1/staff/${id}`, {
+        const res = await fetch(`${API_BASE_URL}/api/v1/staff/${id}`, {
           method: 'DELETE',
           headers: { 'Authorization': `Bearer ${token}` }
         });
