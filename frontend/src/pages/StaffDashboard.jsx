@@ -81,7 +81,7 @@ export function StaffDashboard({ user, onLogout }) {
 
         {/* Content Area */}
         <div>
-          {activeTab === 'attendance' && <AttendanceTracker staffId={user?.staffId} />}
+          {activeTab === 'attendance' && <AttendanceTracker staffId={user?.staffId} user={user} />}
           {activeTab === 'profile' && <MyProfile user={user} />}
         </div>
         
@@ -163,6 +163,18 @@ function MyProfile({ user }) {
               <p className="text-[10px] font-bold text-[#94a3b8] mb-0.5">Current Status</p>
               <p className="text-sm font-bold text-[#1e293b]">{user.status || 'Active'}</p>
             </div>
+            <div>
+              <p className="text-[10px] font-bold text-[#94a3b8] mb-0.5">Office Branch</p>
+              {user.branchName ? (
+                <span className="inline-flex items-center gap-1.5 bg-teal-50 border border-teal-200 text-teal-700 text-xs font-bold px-3 py-1 rounded-lg">
+                  🏢 {user.branchName}
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1.5 bg-amber-50 border border-amber-200 text-amber-600 text-xs font-bold px-3 py-1 rounded-lg">
+                  ⚠️ Not Assigned — Contact Admin
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
@@ -193,12 +205,17 @@ function MyProfile({ user }) {
   );
 }
 
-function AttendanceTracker({ staffId }) {
-  const [status, setStatus] = useState(null); // 'loading', 'not_checked_in', 'checked_in', 'completed', 'error'
+function AttendanceTracker({ staffId, user }) {
+  const [status, setStatus] = useState(null);
   const [record, setRecord] = useState(null);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Branch is locked to what admin assigned — staff cannot change it
+  const assignedBranchId = user?.branchId || null;
+  const assignedBranchName = user?.branchName || null;
+
 
   useEffect(() => {
     // Update live clock
@@ -258,13 +275,17 @@ function AttendanceTracker({ staffId }) {
       const { latitude, longitude } = pos.coords;
 
       const token = localStorage.getItem('sbm_token');
+      const body = { latitude, longitude };
+      // Always use the admin-assigned branch — staff cannot override this
+      if (assignedBranchId) body.branchId = assignedBranchId;
+
       const res = await fetch(`${API_BASE_URL}/api/v1/attendance/check-in`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ latitude, longitude })
+        body: JSON.stringify(body)
       });
 
       const data = await res.json();
@@ -347,6 +368,25 @@ function AttendanceTracker({ staffId }) {
               </div>
             ) : (
               <>
+                {/* Assigned Branch — locked, read-only */}
+                {assignedBranchName && (
+                  <div className="w-full space-y-2">
+                    <label className="text-[10px] font-bold text-[#64748b] uppercase tracking-wider block">
+                      Office Branch
+                    </label>
+                    <div className="w-full rounded-xl border border-[#e2e8f0] bg-[#f1f5f9] px-4 py-3 flex items-center justify-between">
+                      <span className="text-sm font-bold text-[#334155] flex items-center gap-2">
+                        🏢 {assignedBranchName}
+                      </span>
+                      <span className="text-[10px] font-bold text-slate-400 bg-slate-200 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                        🔒 Locked
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-[#94a3b8] flex items-center gap-1">
+                      <MapPin className="h-3 w-3" /> Your branch is set by admin and cannot be changed.
+                    </p>
+                  </div>
+                )}
                 <Button 
                   onClick={handleCheckIn} 
                   disabled={isLoading}
@@ -354,7 +394,7 @@ function AttendanceTracker({ staffId }) {
                 >
                   {isLoading ? 'Checking Location...' : 'Clock In for Today'}
                 </Button>
-                <p className="text-xs text-center text-[#94a3b8] mt-4 font-bold flex items-center justify-center gap-1">
+                <p className="text-xs text-center text-[#94a3b8] mt-2 font-bold flex items-center justify-center gap-1">
                    <MapPin className="h-3 w-3" /> You must be within office premises to clock in.
                 </p>
               </>

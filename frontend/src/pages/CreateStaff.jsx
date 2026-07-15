@@ -17,7 +17,10 @@ export function CreateStaff({ staffList = [], initialData, onAddStaff, onUpdateS
     state: 'Tamilnadu',
     zipCode: '',
     photoUrl: null,
+    branchId: null,
   });
+
+  const [branches, setBranches] = useState([]);
 
   const [success, setSuccess] = useState(false);
   const [photoModalOpen, setPhotoModalOpen] = useState(false);
@@ -27,6 +30,21 @@ export function CreateStaff({ staffList = [], initialData, onAddStaff, onUpdateS
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
+
+  // Fetch branches for assignment dropdown
+  useEffect(() => {
+    const fetchBranches = async () => {
+      try {
+        const token = localStorage.getItem('sbm_token');
+        const res = await fetch(`${API_BASE_URL}/api/v1/branches`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (data.status === 'success') setBranches(data.data.branches);
+      } catch (e) { console.error('Error fetching branches:', e); }
+    };
+    fetchBranches();
+  }, []);
 
   // Auto-generate Staff ID based on existing staff count
   useEffect(() => {
@@ -197,15 +215,48 @@ export function CreateStaff({ staffList = [], initialData, onAddStaff, onUpdateS
             <span className="flex h-6 w-6 items-center justify-center rounded-full bg-teal-50 text-teal-600 text-xs font-bold">#</span>
             <h3 className="text-sm font-bold text-[#1e293b]">Staff Profile ID</h3>
           </div>
-          <div className="space-y-1">
-            <label className="text-xs font-bold text-[#64748b]">Staff ID *</label>
-            <input
-              type="text"
-              required
-              readOnly
-              value={formData.staffId}
-              className="w-full rounded-lg border border-[#cbd5e1] bg-gray-50 px-4 py-2.5 text-sm font-bold text-gray-500 cursor-not-allowed transition-all"
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-[#64748b]">Staff ID *</label>
+              <input
+                type="text"
+                required
+                readOnly
+                value={formData.staffId}
+                className="w-full rounded-lg border border-[#cbd5e1] bg-gray-50 px-4 py-2.5 text-sm font-bold text-gray-500 cursor-not-allowed transition-all"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-[#64748b]">
+                Office Branch Assignment
+                {isEditing && (
+                  <span className="ml-2 text-[10px] font-bold text-amber-500 uppercase tracking-wider">🔒 Locked</span>
+                )}
+              </label>
+              {isEditing ? (
+                /* EDIT MODE — locked, read-only */
+                <div className="w-full rounded-lg border border-[#cbd5e1] bg-gray-50 px-4 py-2.5 flex items-center justify-between">
+                  <span className="text-sm font-bold text-gray-500 flex items-center gap-2">
+                    🏢 {branches.find(b => b.id === formData.branchId)?.name || 'No Branch Assigned'}
+                  </span>
+                  <span className="text-[10px] font-bold text-slate-400 bg-slate-200 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                    Cannot Change
+                  </span>
+                </div>
+              ) : (
+                /* CREATE MODE — editable dropdown */
+                <select
+                  value={formData.branchId ?? ''}
+                  onChange={(e) => setFormData({ ...formData, branchId: e.target.value ? parseInt(e.target.value) : null })}
+                  className="w-full rounded-lg border border-[#cbd5e1] bg-white px-4 py-2.5 text-sm text-[#334155] focus:border-teal-500 focus:outline-none transition-all"
+                >
+                  <option value="">-- No Branch Assigned --</option>
+                  {branches.map(b => (
+                    <option key={b.id} value={b.id}>{b.name}</option>
+                  ))}
+                </select>
+              )}
+            </div>
           </div>
         </div>
 

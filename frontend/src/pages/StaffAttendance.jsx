@@ -7,6 +7,7 @@ import jsPDF from 'jspdf';
 
 export function StaffAttendance({ staff = [] }) {
   const [records, setRecords] = useState([]);
+  const [branches, setBranches] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   
@@ -16,23 +17,37 @@ export function StaffAttendance({ staff = [] }) {
   const [filterDate, setFilterDate] = useState(today);
   const [filterMonth, setFilterMonth] = useState(currentMonth);
   const [filterMode, setFilterMode] = useState('daily'); // 'daily' or 'monthly'
+  const [filterBranch, setFilterBranch] = useState('all');
+
+  // Fetch branches once on mount
+  useEffect(() => {
+    const fetchBranches = async () => {
+      try {
+        const token = localStorage.getItem('sbm_token');
+        const res = await fetch(`${API_BASE_URL}/api/v1/branches`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (data.status === 'success') setBranches(data.data.branches);
+      } catch (e) { console.error('Error fetching branches:', e); }
+    };
+    fetchBranches();
+  }, []);
 
   useEffect(() => {
     fetchAttendance();
-  }, [filterDate, filterMonth, filterMode]);
+  }, [filterDate, filterMonth, filterMode, filterBranch]);
 
   const fetchAttendance = async () => {
     setIsLoading(true);
     try {
       const token = localStorage.getItem('sbm_token');
-      let query = '';
-      if (filterMode === 'daily') {
-        query = `?date=${filterDate}`;
-      } else if (filterMode === 'monthly') {
-        query = `?month=${filterMonth}`;
-      }
+      const params = new URLSearchParams();
+      if (filterMode === 'daily') params.set('date', filterDate);
+      else if (filterMode === 'monthly') params.set('month', filterMonth);
+      if (filterBranch && filterBranch !== 'all') params.set('branchId', filterBranch);
 
-      const res = await fetch(`${API_BASE_URL}/api/v1/attendance/all${query}`, {
+      const res = await fetch(`${API_BASE_URL}/api/v1/attendance/all?${params.toString()}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
@@ -147,7 +162,8 @@ export function StaffAttendance({ staff = [] }) {
         {/* Filters and Stats Row */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mt-6">
           {/* Left Column: Selectors */}
-          <div className={`w-full md:w-auto ${isGeneratingPDF ? 'hidden' : 'print:hidden'}`}>
+          {/* Left Column: Date + Branch Selectors */}
+          <div className={`flex flex-wrap gap-4 ${isGeneratingPDF ? 'hidden' : 'print:hidden'}`}>
             {filterMode === 'daily' ? (
               <div className="space-y-1">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-[#64748b]">Select Date</span>
@@ -169,6 +185,21 @@ export function StaffAttendance({ staff = [] }) {
                 />
               </div>
             )}
+
+            {/* Branch Filter */}
+            <div className="space-y-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#64748b]">Filter by Branch</span>
+              <select
+                value={filterBranch}
+                onChange={(e) => setFilterBranch(e.target.value)}
+                className="w-48 rounded-lg border border-[#cbd5e1] bg-white px-3 py-2 text-xs text-[#334155] focus:border-[#3b82f6] focus:outline-none font-semibold"
+              >
+                <option value="all">All Branches</option>
+                {branches.map(b => (
+                  <option key={b.id} value={b.id}>{b.name}</option>
+                ))}
+              </select>
+            </div>
           </div>
 
           {/* Right Column: Statistics Box (Looks exactly like the reference card) */}
@@ -241,6 +272,7 @@ export function StaffAttendance({ staff = [] }) {
             <thead className="bg-[#f8fafc] text-[10px] font-bold uppercase tracking-wider text-[#64748b] border-b border-[#e2e8f0]">
               <tr>
                 <th className="p-4 pl-6">Staff Member</th>
+                <th className="p-4">Checked-In Branch</th>
                 <th className="p-4">Date</th>
                 <th className="p-4">Check In</th>
                 <th className="p-4">Check Out</th>
@@ -271,6 +303,11 @@ export function StaffAttendance({ staff = [] }) {
                         <span className="text-[10px] text-[#64748b] font-medium">{record.staff?.staffId}</span>
                       </div>
                     </div>
+                  </td>
+                  <td className="p-4">
+                    <span className="inline-flex items-center gap-1.5 bg-teal-50 border border-teal-200 text-teal-700 text-[10px] font-bold px-2 py-1 rounded-md">
+                      🏢 {record.branchName || 'N/A'}
+                    </span>
                   </td>
                   <td className="p-4 font-semibold text-[#1e293b]">{record.date}</td>
                   <td className="p-4 font-semibold text-[#059669]">{formatTime(record.checkIn)}</td>

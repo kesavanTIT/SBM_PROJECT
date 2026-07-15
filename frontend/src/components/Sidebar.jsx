@@ -10,6 +10,7 @@ import {
   UserPlus, 
   UserCheck,
   X,
+  Building2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Logo } from './Logo';
@@ -168,6 +169,22 @@ export function Sidebar({ activePage, setActivePage, staffCount = 0, isCollapsed
         >
           <CalendarCheck className="h-5 w-5 shrink-0" />
           {!isCollapsed && <span className="animate-fadeIn">Staff Attendance</span>}
+        </button>
+
+        {/* Manage Branches Link */}
+        <button
+          onClick={() => setActivePage('manage-branches')}
+          className={cn(
+            "flex w-full items-center rounded-lg py-2 text-sm font-medium transition-all duration-200 outline-none",
+            isCollapsed ? "justify-center px-0" : "px-4 gap-3.5",
+            activePage === 'manage-branches'
+              ? "bg-[#1e293b] text-white shadow-sm"
+              : "hover:bg-[#111827] hover:text-white"
+          )}
+          title={isCollapsed ? "Manage Branches" : undefined}
+        >
+          <Building2 className="h-5 w-5 shrink-0" />
+          {!isCollapsed && <span className="animate-fadeIn">Manage Branches</span>}
         </button>
 
       </nav>

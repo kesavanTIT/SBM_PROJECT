@@ -39,11 +39,7 @@ export function Header({ title, subtitle, searchValue, onSearchChange, onMenuTog
           />
         </div>
 
-        {/* Notifications Icon */}
-        <button className="relative flex h-10 w-10 items-center justify-center rounded-full border border-[#e2e8f0] hover:bg-[#f8fafc] text-[#64748b] hover:text-[#1e293b] transition-all duration-200">
-          <Bell className="h-5 w-5" />
-          <span className="absolute top-2.5 right-2.5 h-2 w-2 rounded-full bg-red-500" />
-        </button>
+
 
         {/* Admin Profile Widget */}
         <div className="flex items-center gap-3 border-l border-[#e2e8f0] pl-6">

@@ -9,6 +9,7 @@ import { StaffProfile } from './pages/StaffProfile';
 import { StaffAttendance } from './pages/StaffAttendance';
 import { Login } from './pages/Login';
 import { StaffDashboard } from './pages/StaffDashboard';
+import { ManageBranches } from './pages/ManageBranches';
 
 const defaultStaff = [
   { id: 101, name: 'Elena Rostova', email: 'elena.r@sbm.academy', phone: '+91 99887 76655', role: 'Teacher', department: 'Science', joinDate: '2026-01-15', status: 'Present' },
@@ -52,10 +53,16 @@ function App() {
     if (role === 'admin') {
       localStorage.setItem('sbm_admin', JSON.stringify(user));
       setAdminUser(user);
+      // Clear any old staff session
+      localStorage.removeItem('sbm_staff');
+      setStaffUser(null);
     } else if (role === 'staff') {
       localStorage.setItem('sbm_staff', JSON.stringify(user));
       setStaffUser(user);
       setActivePage('staff-dashboard');
+      // Clear any old admin session
+      localStorage.removeItem('sbm_admin');
+      setAdminUser(null);
     }
     setIsAuthenticated(true);
   };
@@ -63,7 +70,9 @@ function App() {
   const handleLogout = () => {
     localStorage.removeItem('sbm_token');
     localStorage.removeItem('sbm_admin');
+    localStorage.removeItem('sbm_staff');
     setAdminUser(null);
+    setStaffUser(null);
     setIsAuthenticated(false);
   };
 
@@ -127,6 +136,8 @@ function App() {
         return { title: 'Staff Directory', subtitle: 'Manage active profiles and access controls.' };
       case 'staff-attendance':
         return { title: 'Staff Attendance Report', subtitle: 'Daily log and status controls.' };
+      case 'manage-branches':
+        return { title: 'Manage Branches', subtitle: 'Configure branches, GPS coordinates, and geofencing ranges.' };
       default:
         return { title: 'Admin Console', subtitle: 'SBM Admin Portal' };
     }
@@ -246,6 +257,10 @@ function App() {
               staff={staff} 
               onToggleAttendance={handleToggleAttendance}
             />
+          )}
+
+          {activePage === 'manage-branches' && (
+            <ManageBranches />
           )}
         </main>
       </div>
