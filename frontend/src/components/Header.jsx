@@ -1,12 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Search, Bell, ChevronDown, Menu } from 'lucide-react';
 
 export function Header({ title, subtitle, searchValue, onSearchChange, onMenuToggle }) {
+  const [profileImg, setProfileImg] = useState("https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&h=150&q=80");
+
   const currentDate = new Date().toLocaleDateString('en-US', {
     month: 'long',
     day: 'numeric',
     year: 'numeric',
   });
+
+  const handleImageChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      const imgUrl = URL.createObjectURL(e.target.files[0]);
+      setProfileImg(imgUrl);
+    }
+  };
 
   return (
     <header className="sticky top-0 z-20 flex h-20 items-center justify-between border-b border-[#e2e8f0] bg-white px-4 md:px-8">
@@ -42,12 +51,19 @@ export function Header({ title, subtitle, searchValue, onSearchChange, onMenuTog
 
 
         {/* Admin Profile Widget */}
-        <div className="flex items-center gap-3 border-l border-[#e2e8f0] pl-6">
-          <img
-            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&h=150&q=80"
-            alt="Admin Profile"
-            className="h-10 w-10 rounded-full object-cover ring-2 ring-teal-500/20"
-          />
+        <div className="flex items-center gap-3 border-l border-[#e2e8f0] pl-6 relative group cursor-pointer" onClick={() => document.getElementById('profile-upload').click()}>
+          <div className="relative">
+            <img
+              src={profileImg}
+              alt="Admin Profile"
+              className="h-10 w-10 rounded-full object-cover ring-2 ring-teal-500/20 group-hover:ring-teal-500 transition-all"
+            />
+            {/* Hover overlay for 'Add Photo' */}
+            <div className="absolute inset-0 bg-black/40 rounded-full hidden group-hover:flex items-center justify-center">
+              <span className="text-[8px] font-bold text-white uppercase text-center leading-tight">Change<br/>Photo</span>
+            </div>
+          </div>
+          <input type="file" id="profile-upload" className="hidden" accept="image/*" onChange={handleImageChange} />
           <div className="hidden flex-col md:flex">
             <span className="text-xs font-bold text-[#1e293b]">Administrator</span>
             <span className="text-[10px] font-bold text-teal-600 uppercase tracking-wider mt-0.5">Admin</span>

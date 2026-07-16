@@ -56,7 +56,7 @@ export function DashboardOverview({ staff = [] }) {
       </div>
 
       {/* 2. Grid of Cards matching reference stats layout */}
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2">
         {/* Card 1: Total Staff */}
         <div className="flex items-center justify-between rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-sm">
           <div className="space-y-1">
@@ -81,17 +81,7 @@ export function DashboardOverview({ staff = [] }) {
           </div>
         </div>
 
-        {/* Card 3: Active Departments */}
-        <div className="flex items-center justify-between rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-sm">
-          <div className="space-y-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#94a3b8]">Active Departments</span>
-            <h3 className="text-3xl font-extrabold text-[#1e293b]">5</h3>
-            <p className="text-[10px] text-gray-400 font-medium">Science, Maths, English, IT, Admin</p>
-          </div>
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-500">
-            <Award className="h-6 w-6" />
-          </div>
-        </div>
+
       </div>
 
       {/* 3. Charts Grid matching reference monthly/weekly trends */}
