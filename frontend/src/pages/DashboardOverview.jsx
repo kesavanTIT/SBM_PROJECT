@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import API_BASE_URL from '../config';
 import { 
   ResponsiveContainer, 
   AreaChart, 
@@ -33,8 +34,28 @@ const weeklyData = [
 ];
 
 export function DashboardOverview({ staff = [] }) {
+  const [presentToday, setPresentToday] = useState(0);
+
+  useEffect(() => {
+    const fetchTodayAttendance = async () => {
+      try {
+        const token = localStorage.getItem('sbm_token');
+        const today = new Date().toISOString().split('T')[0];
+        const res = await fetch(`${API_BASE_URL}/api/v1/attendance/all?date=${today}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (data.status === 'success') {
+          setPresentToday(data.data.attendance.length);
+        }
+      } catch (error) {
+        console.error('Error fetching today attendance:', error);
+      }
+    };
+    fetchTodayAttendance();
+  }, []);
+
   const totalStaff = staff.length;
-  const presentToday = staff.filter(s => s.status === 'Present').length;
   const attendanceRate = totalStaff > 0 ? Math.round((presentToday / totalStaff) * 100) : 0;
 
   return (
